@@ -48,15 +48,18 @@ class EasyEnglishTerminal(object):
         parser.add_option("-d", "--dir", dest="show_files",
                           action="store_true", default=False,
                           help="Show files.")
-
         parser.add_option("-f", "--file", dest="file_name", type="string", default="",
                           action="store", help="The file name. The file is in the Word Path Dir"
                           )
+        parser.add_option("-l", "--log", dest="show_compile_log",
+                          action="store_true", default=False,
+                          help="Compile file and show latex logs .")
         # parser.add_option("-p", "--clear-daily", action="store_true", default=False, dest="clear_daily",
         #                   help="Clear daily task if call this option")
         (self.options, _) = parser.parse_args()
 
     def handler(self):
+        # print(self.options)
         if self.options.show_info:
             self.show_info()
         if self.options.show_files:
@@ -66,4 +69,4 @@ class EasyEnglishTerminal(object):
                 self.E_BOLD + "[!] Must input file name " + self.E_END
             )
         else:
-            main(self.options.file_name)
+            main(self.options.file_name, not self.options.show_compile_log)

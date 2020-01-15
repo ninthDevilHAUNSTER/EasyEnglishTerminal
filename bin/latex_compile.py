@@ -2,12 +2,12 @@ import os
 from datetime import datetime
 import shutil
 import config.latex_config as la
-from config import TMP_LATEX_PATH,ADVANCED_INTERPRETATION_WORDS_PATH
+from config import TMP_LATEX_PATH, ADVANCED_INTERPRETATION_WORDS_PATH
 from config import WordList, Word
 from bin.xlsx_csv_reader import handle_xlsx
 
 
-def dictation_paper_compiler(words, sentences, user="匿名", saving_file_name="words"):
+def dictation_paper_compiler(words, sentences, user="匿名", saving_file_name="words", quiet=True):
     latex = la.latex_header_gen(title="每日单词", user_name=user)
     if words.__len__() > 0:
         latex += la.word_part_start()
@@ -35,7 +35,7 @@ def dictation_paper_compiler(words, sentences, user="匿名", saving_file_name="
     latex += la.tail()
 
     open(TMP_LATEX_PATH + "\\tmp.tex", 'w', encoding="utf8").write(latex)
-    os.system(la.compile_cmd(TMP_LATEX_PATH + '\\tmp.tex'))
+    os.system(la.compile_cmd(TMP_LATEX_PATH + '\\tmp.tex', quiet=quiet))
     os.remove('tmp.aux')
     os.remove('tmp.log')
     f_name = datetime.strftime(datetime.now(), '{}_dict_%m_%d'.format(saving_file_name.split(".")[0])) + ".pdf"
@@ -43,7 +43,7 @@ def dictation_paper_compiler(words, sentences, user="匿名", saving_file_name="
     return f_name
 
 
-def answer_sheet_compiler(words, sentences, user="烧包", saving_file_name="answer"):
+def answer_sheet_compiler(words, sentences, user="烧包", saving_file_name="answer", quiet=True):
     latex = la.latex_header_gen("每日单词答案", user_name=user)
     if words.__len__() > 0:
         latex += la.word_part_start()
@@ -76,7 +76,7 @@ def answer_sheet_compiler(words, sentences, user="烧包", saving_file_name="ans
     latex += la.tail()
 
     open(TMP_LATEX_PATH + "\\tmp.tex", 'w', encoding="utf8").write(latex)
-    os.system(la.compile_cmd(TMP_LATEX_PATH + '\\tmp.tex'))
+    os.system(la.compile_cmd(TMP_LATEX_PATH + '\\tmp.tex', quiet=quiet))
     os.remove('tmp.aux')
     os.remove('tmp.log')
     f_name = datetime.strftime(datetime.now(), '{}_ans_%m_%d'.format(saving_file_name.split(".")[0])) + ".pdf"
@@ -84,9 +84,11 @@ def answer_sheet_compiler(words, sentences, user="烧包", saving_file_name="ans
     return f_name
 
 
-def main(file_name):
+def main(file_name, quiet):
     # print(file_name)
     wl = handle_xlsx(file_name)
     words, sentences = wl.split()
-    dictation_paper_compiler(words.__list__(), sentences.__list__(), saving_file_name=file_name)
-    answer_sheet_compiler(words.__list__(), sentences.__list__(), saving_file_name=file_name)
+    dictation_paper_compiler(words.__list__(), sentences.__list__(), saving_file_name=file_name, quiet=quiet)
+    print("dictation paper compiled !")
+    answer_sheet_compiler(words.__list__(), sentences.__list__(), saving_file_name=file_name, quiet=quiet)
+    print("answer sheet paper compiled !")
